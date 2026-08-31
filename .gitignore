@@ -1,0 +1,4 @@
+harness
+harness_asan
+*.o
+*.log
