@@ -95,6 +95,23 @@ code if anything fails, so it can be reused as a gate later instead of eyeballed
   divide by zero (`calc 5 / 0`), and hammering `history` before any turns are
   stored — all produce a message instead of a crash.
 
+## 6. A bug found during real-world testing (WSL2)
+
+After the initial pass looked clean in my sandbox, I ran the compiled binary
+interactively in my actual WSL2/Ubuntu terminal and typed `exit` — and it
+didn't quit. It fell through to the default echo response instead. Turned out
+the input line I'd typed had a trailing space (`"exit "`), and the shutdown
+check was a strict `strcmp(input, "exit") == 0`, so anything other than the
+four exact characters `exit` failed the match.
+
+I asked the AI to harden the input-trimming step: strip the newline *and* a
+stray `\r` (in case a Windows-side terminal ever sends CRLF) *and* any
+trailing spaces/tabs, using `isspace()` from `<ctype.h>`, before doing any
+comparisons at all. Rebuilt, reran `test.sh`, confirmed `exit `, `exit\t`, and
+plain `exit` all shut the program down cleanly now, and that AddressSanitizer
+was still clean. This is exactly the kind of thing SDD is supposed to catch
+before submission rather than during grading.
+
 ## 6. What's mine vs. what the AI wrote
 
 The state machine, the memory-safety rules, the tool choice, the function

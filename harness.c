@@ -251,7 +251,18 @@ int main(void) {
             break;   /* EOF (e.g. piped input ran out) -> shut down cleanly */
         }
 
-        input[strcspn(input, "\n")] = '\0';   /* strip the trailing newline */
+        /* Strip the trailing newline, plus a stray '\r' some Windows/WSL
+         * terminal configs send, plus any trailing spaces/tabs the user
+         * typed -- otherwise "exit " (with a trailing space) would fail
+         * this exact-match check and never quit. Caught via test.sh. */
+        {
+            size_t len;
+            input[strcspn(input, "\r\n")] = '\0';
+            len = strlen(input);
+            while (len > 0 && isspace((unsigned char)input[len - 1])) {
+                input[--len] = '\0';
+            }
+        }
 
         if (strcmp(input, "exit") == 0) {
             break;
