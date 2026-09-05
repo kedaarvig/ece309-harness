@@ -112,7 +112,7 @@ plain `exit` all shut the program down cleanly now, and that AddressSanitizer
 was still clean. This is exactly the kind of thing SDD is supposed to catch
 before submission rather than during grading.
 
-## 6. What's mine vs. what the AI wrote
+## 7. What's mine vs. what the AI wrote
 
 The state machine, the memory-safety rules, the tool choice, the function
 signatures, the specific bugs called out in section 3, and this log are mine.
